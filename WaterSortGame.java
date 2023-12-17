@@ -24,7 +24,9 @@ public class WaterSortGame {
     for (int i = 0; i < colors.length; i++) {
       for (int j = 0; j < this.maxBottleSize; j++) {
         int randomBottle = random.nextInt(bottles.length - 1);
-        if (bottles[randomBottle].isFull() || (!bottles[randomBottle].isEmpty() && bottles[randomBottle].getTop().getHeight() == bottles[randomBottle].getSize() - 1)) {
+        if (bottles[randomBottle].isFull() || (!bottles[randomBottle].isEmpty()
+            && bottles[randomBottle].getTop().getColor().equals(colors[i])
+            && bottles[randomBottle].getTop().getHeight() == bottles[randomBottle].getSize() - 1)) {
           j--;
           continue;
         } else if (!bottles[randomBottle].isEmpty() && bottles[randomBottle].getTop().getColor().equals(colors[i])) {
@@ -36,6 +38,9 @@ public class WaterSortGame {
         }
       }
     }
+    bottles[0].pop();
+    bottles[0].pop();
+    bottles[1].pop();
     display(bottles);
   }
 
@@ -47,12 +52,14 @@ public class WaterSortGame {
       temp2[i] = new Bottle(bottles[0].getSize());
     }
     for (int i = 0; i < bottles.length - 1; i++) {
-      for (int j = 0; j < bottles[i].getSize(); j++) {
+      int limit = bottles[i].getColorBlocksCount();
+      for (int j = 0; j < limit; j++) {
         temp1[i].push(bottles[i].pop());
       }
     }
     for (int i = 0; i < bottles.length - 1; i++) {
-      for (int j = 0; j < bottles[i].getSize(); j++) {
+      int limit = temp1[i].getColorBlocksCount();
+      for (int j = 0; j < limit; j++) {
         ColorBlock CB = temp1[i].pop();
         bottles[i].push(CB);
         temp2[i].push(CB);
@@ -60,7 +67,11 @@ public class WaterSortGame {
     }
     for (int i = 0; i < temp2[0].getSize(); i++) {
       for (int j = 0; j < temp2.length; j++) {
-        System.out.print(temp2[j].pop().getBlock() + "\t");
+        if (temp2[j].getSize() - temp2[j].getColorBlocksCount() - i > 0) {
+          System.out.print(temp2[j].getTop().getEmptyBlock() + "\t");
+        } else {
+          System.out.print(temp2[j].pop().getBlock() + "\t");
+        }
       }
       System.out.println();
     }

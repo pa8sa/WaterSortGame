@@ -70,4 +70,8 @@ public class ColorBlock {
   public String getBlock() {
     return this.colorCode + "██ " + this.reset;
   }
+
+  public String getEmptyBlock() {
+    return "\u001B[30m" + "██ " + this.reset;
+  }
 }

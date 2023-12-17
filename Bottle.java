@@ -50,4 +50,8 @@ public class Bottle {
     }
     return array[top];
   }
+
+  public int getColorBlocksCount() {
+    return top + 1;
+  }
 }
