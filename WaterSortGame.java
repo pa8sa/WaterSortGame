@@ -40,5 +40,7 @@ public class WaterSortGame {
     }
     bottles[3].select();
     Bottle.displayBottles(bottles);
+    Bottle.pour(5, bottles);
+    Bottle.displayBottles(bottles);
   }
 }

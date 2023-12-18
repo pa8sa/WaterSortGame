@@ -29,6 +29,13 @@ public class Bottle {
     return false;
   }
 
+  public Boolean isComplete() {
+    if (this.isFull() && this.getTop().getHeight() == this.getSize()) {
+      return true;
+    }
+    return false;
+  }
+
   public ColorBlock pop() {
     if (this.isEmpty()) {
       return null;
@@ -102,6 +109,15 @@ public class Bottle {
     return isSelected;
   }
 
+  public static Bottle getSelectedBottle(Bottle... bottles) {
+    for (int i = 0; i < bottles.length; i++) {
+      if (bottles[i].getSelect()) {
+        return bottles[i];
+      }
+    }
+    return null;
+  }
+
   public void select() {
     this.isSelected = true;
   }
@@ -114,11 +130,12 @@ public class Bottle {
 
   public static void selectNext(Bottle... bottles) {
     for (int i = 0; i < bottles.length; i++) {
-      if (bottles[i].isSelected) {
-        bottles[i].deSelect();
-        bottles[(i + 1) % bottles.length].select();
-        return;
-      }
+      if (bottles[i].isFull() || bottles[i].isEmpty())
+        if (bottles[i].isSelected) {
+          bottles[i].deSelect();
+          bottles[(i + 1) % bottles.length].select();
+          return;
+        }
     }
   }
 
@@ -130,5 +147,41 @@ public class Bottle {
         return;
       }
     }
+  }
+
+  public static boolean pour(int bottleNumber, Bottle... bottles) {
+    if (bottles[bottleNumber - 1].isFull()) {
+      return false;
+    }
+    Bottle selectedBottle = getSelectedBottle(bottles);
+    if (selectedBottle.isEmpty()) {
+      return false;
+    }
+    if (bottles[bottleNumber - 1].isEmpty()) {
+      int limit = selectedBottle.getTop().getHeight();
+      for (int i = 0; i < limit; i++) {
+        ColorBlock CB = selectedBottle.pop();
+        CB.setHeight(i + 1);
+        bottles[bottleNumber - 1].push(CB);
+      }
+      return true;
+    }
+    if (bottles[bottleNumber - 1] == selectedBottle) {
+      return false;
+    }
+    if (selectedBottle.getTop().getColor() != bottles[bottleNumber - 1].getTop().getColor()) {
+      return false;
+    }
+    if (selectedBottle.getTop().getHeight() + bottles[bottleNumber - 1].getTop().getHeight() > bottles[bottleNumber - 1]
+        .getSize()) {
+      return false;
+    }
+    int limit = selectedBottle.getTop().getHeight();
+    for (int i = 0; i < limit; i++) {
+      ColorBlock CB = selectedBottle.pop();
+      CB.setHeight(bottles[bottleNumber - 1].getTop().getHeight() + 1);
+      bottles[bottleNumber - 1].push(CB);
+    }
+    return true;
   }
 }
