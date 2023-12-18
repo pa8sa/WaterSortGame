@@ -14,7 +14,7 @@ public class WaterSortGame {
   }
 
   public void initial() {
-    for (int i = 0; i < colors.length; i++) {
+    for (int i = 0; i < colors.length + 1; i++) {
       bottles[i] = new Bottle(maxBottleSize);
     }
   }
@@ -38,42 +38,7 @@ public class WaterSortGame {
         }
       }
     }
-    bottles[0].pop();
-    bottles[0].pop();
-    bottles[1].pop();
-    display(bottles);
-  }
-
-  public static void display(Bottle[] bottles) {
-    Bottle[] temp1 = new Bottle[bottles.length - 1];
-    Bottle[] temp2 = new Bottle[bottles.length - 1];
-    for (int i = 0; i < bottles.length - 1; i++) {
-      temp1[i] = new Bottle(bottles[0].getSize());
-      temp2[i] = new Bottle(bottles[0].getSize());
-    }
-    for (int i = 0; i < bottles.length - 1; i++) {
-      int limit = bottles[i].getColorBlocksCount();
-      for (int j = 0; j < limit; j++) {
-        temp1[i].push(bottles[i].pop());
-      }
-    }
-    for (int i = 0; i < bottles.length - 1; i++) {
-      int limit = temp1[i].getColorBlocksCount();
-      for (int j = 0; j < limit; j++) {
-        ColorBlock CB = temp1[i].pop();
-        bottles[i].push(CB);
-        temp2[i].push(CB);
-      }
-    }
-    for (int i = 0; i < temp2[0].getSize(); i++) {
-      for (int j = 0; j < temp2.length; j++) {
-        if (temp2[j].getSize() - temp2[j].getColorBlocksCount() - i > 0) {
-          System.out.print(temp2[j].getTop().getEmptyBlock() + "\t");
-        } else {
-          System.out.print(temp2[j].pop().getBlock() + "\t");
-        }
-      }
-      System.out.println();
-    }
+    bottles[3].select();
+    Bottle.displayBottles(bottles);
   }
 }

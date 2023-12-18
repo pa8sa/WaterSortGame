@@ -1,5 +1,5 @@
 public class ColorBlock {
-  private String reset = "\u001B[0m";
+  private static String reset = "\u001B[0m";
   private String colorCode;
   private String color;
   private int height;
@@ -68,10 +68,10 @@ public class ColorBlock {
   }
 
   public String getBlock() {
-    return this.colorCode + "██ " + this.reset;
+    return this.colorCode + "███ " + reset;
   }
 
-  public String getEmptyBlock() {
-    return "\u001B[30m" + "██ " + this.reset;
+  public static String getEmptyBlock() {
+    return "\u001B[30m" + "--- " + reset;
   }
 }
