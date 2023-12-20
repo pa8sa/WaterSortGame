@@ -30,7 +30,6 @@ public class ColorBlock {
       this.colorCode = "\u001B[90m";
       this.color = "gray";
     }
-
     this.height = height;
   }
 

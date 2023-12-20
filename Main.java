@@ -1,7 +1,68 @@
+import java.util.Scanner;
+
 public class Main {
   public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
     clearScreen();
-    WaterSortGame wsg = new WaterSortGame(new String[] { "blue", "red", "green", "yellow" }, 4);
+
+    System.out.println("Number Of Colors: ");
+    int count = scanner.nextInt();
+
+    String[] colors = new String[count];
+    System.out.println("Colors: ");
+    scanner.nextLine();
+    for (int i = 0; i < count; i++) {
+      colors[i] = scanner.nextLine();
+    }
+
+    System.out.println("Max Bottle Size: ");
+    int maxBottleSize = scanner.nextInt();
+
+    WaterSortGame wsg = new WaterSortGame(colors, maxBottleSize);
+
+    String input;
+    String command;
+    int number;
+
+    wsg.displayBottles();
+
+    scanner.nextLine();
+
+    while (true) {
+      input = scanner.nextLine();
+      System.out.println();
+      command = input.split(" ")[0];
+
+      if (input.split(" ").length > 1) {
+        number = Integer.parseInt(input.split(" ")[1]);
+      } else {
+        number = -1;
+      }
+
+      if (command.equals("select") && number != -1) {
+        wsg.select(number);
+        wsg.displayBottles();
+      } else if (command.equals("display")) {
+        wsg.displayBottles();
+      } else if (command.equals("deSelect")) {
+        wsg.deSelect();
+        wsg.displayBottles();
+      } else if (command.equals("selectNext")) {
+        wsg.selectNext();
+        wsg.displayBottles();
+      } else if (command.equals("selectPrevious")) {
+        wsg.selectPrevious();
+        wsg.displayBottles();
+      } else if (command.equals("pour") && number != -1) {
+        wsg.pour(number);
+        wsg.displayBottles();
+      } else if (command.equals("addEmptyBottle")) {
+        wsg.addEmptyBottle();;
+        wsg.displayBottles();
+      } else if (command.equals("end")) {
+        break;
+      }
+    }
   }
 
   public static void clearScreen() {

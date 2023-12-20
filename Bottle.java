@@ -64,47 +64,6 @@ public class Bottle {
     return top + 1;
   }
 
-  public static void displayBottles(Bottle... bottles) {
-    Bottle[] temp1 = new Bottle[bottles.length];
-    Bottle[] temp2 = new Bottle[bottles.length];
-    for (int i = 0; i < bottles.length; i++) {
-      temp1[i] = new Bottle(bottles[0].getSize());
-      temp2[i] = new Bottle(bottles[0].getSize());
-    }
-    for (int i = 0; i < bottles.length; i++) {
-      int limit = bottles[i].getColorBlocksCount();
-      for (int j = 0; j < limit; j++) {
-        temp1[i].push(bottles[i].pop());
-      }
-    }
-    for (int i = 0; i < bottles.length; i++) {
-      int limit = temp1[i].getColorBlocksCount();
-      for (int j = 0; j < limit; j++) {
-        ColorBlock CB = temp1[i].pop();
-        bottles[i].push(CB);
-        temp2[i].push(CB);
-      }
-    }
-    for (int i = 0; i < temp2[0].getSize(); i++) {
-      for (int j = 0; j < temp2.length; j++) {
-        if (temp2[j].getSize() - temp2[j].getColorBlocksCount() - i > 0) {
-          System.out.print(ColorBlock.getEmptyBlock() + "\t");
-        } else {
-          System.out.print(temp2[j].pop().getBlock() + "\t");
-        }
-      }
-      System.out.println();
-    }
-    for (int i = 0; i < bottles.length; i++) {
-      if (bottles[i].getSelect()) {
-        System.out.println("╚═╝");
-        break;
-      } else {
-        System.out.print("\t");
-      }
-    }
-  }
-
   public boolean getSelect() {
     return isSelected;
   }
@@ -126,62 +85,5 @@ public class Bottle {
     if (this.isSelected == true) {
       this.isSelected = false;
     }
-  }
-
-  public static void selectNext(Bottle... bottles) {
-    for (int i = 0; i < bottles.length; i++) {
-      if (bottles[i].isFull() || bottles[i].isEmpty())
-        if (bottles[i].isSelected) {
-          bottles[i].deSelect();
-          bottles[(i + 1) % bottles.length].select();
-          return;
-        }
-    }
-  }
-
-  public static void selectPrevious(Bottle... bottles) {
-    for (int i = 0; i < bottles.length; i++) {
-      if (bottles[i].isSelected) {
-        bottles[i].deSelect();
-        bottles[(i + bottles.length - 1) % bottles.length].select();
-        return;
-      }
-    }
-  }
-
-  public static boolean pour(int bottleNumber, Bottle... bottles) {
-    if (bottles[bottleNumber - 1].isFull()) {
-      return false;
-    }
-    Bottle selectedBottle = getSelectedBottle(bottles);
-    if (selectedBottle.isEmpty()) {
-      return false;
-    }
-    if (bottles[bottleNumber - 1].isEmpty()) {
-      int limit = selectedBottle.getTop().getHeight();
-      for (int i = 0; i < limit; i++) {
-        ColorBlock CB = selectedBottle.pop();
-        CB.setHeight(i + 1);
-        bottles[bottleNumber - 1].push(CB);
-      }
-      return true;
-    }
-    if (bottles[bottleNumber - 1] == selectedBottle) {
-      return false;
-    }
-    if (selectedBottle.getTop().getColor() != bottles[bottleNumber - 1].getTop().getColor()) {
-      return false;
-    }
-    if (selectedBottle.getTop().getHeight() + bottles[bottleNumber - 1].getTop().getHeight() > bottles[bottleNumber - 1]
-        .getSize()) {
-      return false;
-    }
-    int limit = selectedBottle.getTop().getHeight();
-    for (int i = 0; i < limit; i++) {
-      ColorBlock CB = selectedBottle.pop();
-      CB.setHeight(bottles[bottleNumber - 1].getTop().getHeight() + 1);
-      bottles[bottleNumber - 1].push(CB);
-    }
-    return true;
   }
 }
