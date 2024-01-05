@@ -77,6 +77,15 @@ public class Bottle {
     return null;
   }
 
+  public static int getIndexOfSelectedBottle(Bottle... bottles) {
+    for (int i = 0; i < bottles.length; i++) {
+      if (bottles[i].getSelect()) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   public void select() {
     this.isSelected = true;
   }

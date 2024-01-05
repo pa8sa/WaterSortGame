@@ -1,6 +1,9 @@
+import java.util.Arrays;
 import java.util.Random;
 
 public class WaterSortGame {
+  public static Stack commands = new Stack(100);
+  public static Stack redo = new Stack(100);
   private static int perm = 0;
   private String[] colors;
   private Bottle[] bottles;
@@ -92,6 +95,7 @@ public class WaterSortGame {
           if ((!bottles[j].isComplete() && !bottles[j].isEmpty()) || bottles[j].getSize() != maxBottleSize) {
             bottles[i].deSelect();
             bottles[j].select();
+            commands.push("selectNext");
             return;
           }
         }
@@ -106,6 +110,7 @@ public class WaterSortGame {
           if (!bottles[j].isComplete() && !bottles[j].isEmpty() && bottles[j].getSize() == maxBottleSize) {
             bottles[i].deSelect();
             bottles[j].select();
+            commands.push("selectPrevious");
             return;
           }
         }
@@ -115,16 +120,20 @@ public class WaterSortGame {
 
   public void select(int bottleNumber) {
     Bottle selectedBottle = Bottle.getSelectedBottle(bottles);
+    int preIndex = -1;
     if (selectedBottle != null) {
+      preIndex = Bottle.getIndexOfSelectedBottle(bottles);
       selectedBottle.deSelect();
     }
     bottles[bottleNumber - 1].select();
+    commands.push("select " + (preIndex) + " " + (bottleNumber - 1));
   }
 
   public void deSelect() {
     for (int i = 0; i < bottles.length; i++) {
       if (bottles[i].getSelect()) {
         bottles[i].deSelect();
+        commands.push("deSelect " + (i));
         return;
       }
     }
@@ -146,6 +155,7 @@ public class WaterSortGame {
         CB.setHeight(i + 1);
         bottles[bottleNumber - 1].push(CB);
       }
+      commands.push("pour " + Bottle.getIndexOfSelectedBottle(bottles) + " " + (bottleNumber - 1) + " " + limit);
       return true;
     }
     if (bottles[bottleNumber - 1].isEmpty()) {
@@ -155,6 +165,7 @@ public class WaterSortGame {
         CB.setHeight(i + 1);
         bottles[bottleNumber - 1].push(CB);
       }
+      commands.push("pour " + Bottle.getIndexOfSelectedBottle(bottles) + " " + (bottleNumber - 1) + " " + limit);
       return true;
     }
     if (bottles[bottleNumber - 1] == selectedBottle) {
@@ -177,6 +188,7 @@ public class WaterSortGame {
     if (hasWon()) {
       System.out.println("END");
     }
+    commands.push("pour " + Bottle.getIndexOfSelectedBottle(bottles) + " " + (bottleNumber - 1) + " " + limit);
     return true;
   }
 
@@ -211,6 +223,130 @@ public class WaterSortGame {
       bottles = newBottles;
 
       perm++;
+      commands.push("addEmptyBottle");
+    }
+  }
+
+  public void swap(int bottleNumber) {
+    int indexSelectedBottle = Bottle.getIndexOfSelectedBottle(bottles);
+
+    if (indexSelectedBottle == bottleNumber - 1) {
+      return;
+    }
+
+    Bottle temp1 = new Bottle(bottles[indexSelectedBottle].getSize());
+    Bottle temp2 = new Bottle(bottles[bottleNumber - 1].getSize());
+    Bottle temp3 = new Bottle(bottles[indexSelectedBottle].getSize());
+    Bottle temp4 = new Bottle(bottles[bottleNumber - 1].getSize());
+
+    for (; !bottles[indexSelectedBottle].isEmpty();) {
+      temp1.push(bottles[indexSelectedBottle].pop());
+    }
+    for (; !bottles[bottleNumber - 1].isEmpty();) {
+      temp2.push(bottles[bottleNumber - 1].pop());
+    }
+    for (; !temp1.isEmpty();) {
+      temp3.push(temp1.pop());
+    }
+    for (; !temp2.isEmpty();) {
+      temp4.push(temp2.pop());
+    }
+
+    bottles[indexSelectedBottle] = temp4;
+    bottles[bottleNumber - 1] = temp3;
+    commands.push("swap " + indexSelectedBottle + " " + (bottleNumber - 1));
+  }
+
+  public void replaceColor(String firstColor, String secondColor) {
+    for (int i = 0; i < colors.length; i++) {
+      if (colors[i].equals(secondColor)) {
+        return;
+      }
+    }
+    for (int i = 0; i < colors.length; i++) {
+      if (colors[i].equals(firstColor)) {
+        Bottle temp = new Bottle(maxBottleSize);
+        for (int j = 0; j < bottles.length; j++) {
+          if (!bottles[j].isEmpty()) {
+            for (int k = 0; k < bottles[j].getColorBlocksCount(); k++) {
+              ColorBlock CB = bottles[j].pop();
+              if (CB.getColor().equals(firstColor)) {
+                CB.setColor(secondColor);
+              }
+              temp.push(CB);
+            }
+            for (int l = 0; l < temp.getColorBlocksCount(); l++) {
+              bottles[j].push(temp.pop());
+            }
+          }
+        }
+        commands.push("replaceColor " + firstColor + " " + secondColor);
+        break;
+      }
+    }
+  }
+
+  public void undo() {
+    if (!commands.isEmpty()) {
+      String cmd = commands.pop();
+      redo.push(cmd);
+      if (cmd.split(" ")[0].equals("selectNext")) {
+        selectPrevious();
+        commands.pop();
+      } else if (cmd.split(" ")[0].equals("selectPrevious")) {
+        selectNext();
+        commands.pop();
+      } else if (cmd.split(" ")[0].equals("addEmptyBottle")) {
+        perm = 0;
+        bottles = Arrays.copyOf(bottles, bottles.length - 1);
+      } else if (cmd.split(" ")[0].equals("deSelect")) {
+        select(Integer.parseInt(cmd.split(" ")[1]));
+        commands.pop();
+      } else if (cmd.split(" ")[0].equals("select")) {
+        if (Integer.parseInt(cmd.split(" ")[1]) == -1) {
+          deSelect();
+          commands.pop();
+        } else {
+          select(Integer.parseInt(cmd.split(" ")[1]) + 1);
+          commands.pop();
+        }
+      } else if (cmd.split(" ")[0].equals("swap")) {
+        select(Integer.parseInt(cmd.split(" ")[1]) + 1);
+        commands.pop();
+        swap(Integer.parseInt(cmd.split(" ")[2]) + 1);
+        commands.pop();
+      } else if (cmd.split(" ")[0].equals("replaceColor")) {
+        replaceColor(cmd.split(" ")[1], cmd.split(" ")[2]);
+        commands.pop();
+      } else if (cmd.split(" ")[0].equals("pour")) {
+        for (int i = 0; i < Integer.parseInt(cmd.split(" ")[3]); i++) {
+          bottles[Integer.parseInt(cmd.split(" ")[1])].push(bottles[Integer.parseInt(cmd.split(" ")[2])].pop());
+          bottles[Integer.parseInt(cmd.split(" ")[1])].getTop().setHeight(i);
+        }
+      }
+    }
+  }
+
+  public void redo() {
+    if (!redo.isEmpty()) {
+      String cmd = redo.pop();
+      if (cmd.split(" ")[0].equals("selectNext")) {
+        selectNext();
+      } else if (cmd.split(" ")[0].equals("selectPrevious")) {
+        selectPrevious();
+      } else if (cmd.split(" ")[0].equals("addEmptyBottle")) {
+        addEmptyBottle();
+      } else if (cmd.split(" ")[0].equals("deSelect")) {
+        deSelect();
+      } else if (cmd.split(" ")[0].equals("select")) {
+        select(Integer.parseInt(cmd.split(" ")[2]) + 1);
+      } else if (cmd.split(" ")[0].equals("swap")) {
+        swap(Integer.parseInt(cmd.split(" ")[2]) + 1);
+      } else if (cmd.split(" ")[0].equals("replaceColor")) {
+        replaceColor(cmd.split(" ")[1], cmd.split(" ")[2]);
+      } else if (cmd.split(" ")[0].equals("pour")) {
+        pour(Integer.parseInt(cmd.split(" ")[2]) + 1);
+      }
     }
   }
 }
