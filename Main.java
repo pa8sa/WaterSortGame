@@ -41,30 +41,37 @@ public class Main {
 
       if (command.equals("select") && number != -1) {
         wsg.select(number);
+        WaterSortGame.redo.setEmpty();
         wsg.displayBottles();
       } else if (command.equals("display")) {
         wsg.displayBottles();
       } else if (command.equals("deSelect")) {
         wsg.deSelect();
+        WaterSortGame.redo.setEmpty();
         wsg.displayBottles();
       } else if (command.equals("selectNext")) {
         wsg.selectNext();
+        WaterSortGame.redo.setEmpty();
         wsg.displayBottles();
       } else if (command.equals("selectPrevious")) {
         wsg.selectPrevious();
+        WaterSortGame.redo.setEmpty();
         wsg.displayBottles();
       } else if (command.equals("pour") && number != -1) {
         wsg.pour(number);
+        WaterSortGame.redo.setEmpty();
         wsg.displayBottles();
       } else if (command.equals("addEmptyBottle")) {
         wsg.addEmptyBottle();
-        ;
+        WaterSortGame.redo.setEmpty();
         wsg.displayBottles();
       } else if (command.equals("swap") && number != -1) {
         wsg.swap(number);
+        WaterSortGame.redo.setEmpty();
         wsg.displayBottles();
       } else if (command.equals("replaceColor")) {
         wsg.replaceColor(input.split(" ")[1], input.split(" ")[2]);
+        WaterSortGame.redo.setEmpty();
         wsg.displayBottles();
       } else if (command.equals("undo")) {
         wsg.undo();

@@ -268,19 +268,20 @@ public class WaterSortGame {
         Bottle temp = new Bottle(maxBottleSize);
         for (int j = 0; j < bottles.length; j++) {
           if (!bottles[j].isEmpty()) {
-            for (int k = 0; k < bottles[j].getColorBlocksCount(); k++) {
+            for (; !bottles[j].isEmpty();) {
               ColorBlock CB = bottles[j].pop();
               if (CB.getColor().equals(firstColor)) {
                 CB.setColor(secondColor);
               }
               temp.push(CB);
             }
-            for (int l = 0; l < temp.getColorBlocksCount(); l++) {
+            for (; !temp.isEmpty();) {
               bottles[j].push(temp.pop());
             }
           }
         }
         commands.push("replaceColor " + firstColor + " " + secondColor);
+        colors[i] = secondColor;
         break;
       }
     }
@@ -300,7 +301,7 @@ public class WaterSortGame {
         perm = 0;
         bottles = Arrays.copyOf(bottles, bottles.length - 1);
       } else if (cmd.split(" ")[0].equals("deSelect")) {
-        select(Integer.parseInt(cmd.split(" ")[1]));
+        select(Integer.parseInt(cmd.split(" ")[1]) + 1);
         commands.pop();
       } else if (cmd.split(" ")[0].equals("select")) {
         if (Integer.parseInt(cmd.split(" ")[1]) == -1) {
@@ -316,12 +317,12 @@ public class WaterSortGame {
         swap(Integer.parseInt(cmd.split(" ")[2]) + 1);
         commands.pop();
       } else if (cmd.split(" ")[0].equals("replaceColor")) {
-        replaceColor(cmd.split(" ")[1], cmd.split(" ")[2]);
+        replaceColor(cmd.split(" ")[2], cmd.split(" ")[1]);
         commands.pop();
       } else if (cmd.split(" ")[0].equals("pour")) {
         for (int i = 0; i < Integer.parseInt(cmd.split(" ")[3]); i++) {
           bottles[Integer.parseInt(cmd.split(" ")[1])].push(bottles[Integer.parseInt(cmd.split(" ")[2])].pop());
-          bottles[Integer.parseInt(cmd.split(" ")[1])].getTop().setHeight(i);
+          bottles[Integer.parseInt(cmd.split(" ")[1])].getTop().setHeight(i + 1);
         }
       }
     }

@@ -51,4 +51,8 @@ public class Stack {
     }
     System.out.println();
   }
+
+  public void setEmpty() {
+    this.top = -1;
+  }
 }

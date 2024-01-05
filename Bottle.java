@@ -95,4 +95,10 @@ public class Bottle {
       this.isSelected = false;
     }
   }
+
+  public void display() {
+    for (int i = 0; i < top + 1; i++) {
+      System.out.print(getTop().getBlock());
+    }
+  }
 }
