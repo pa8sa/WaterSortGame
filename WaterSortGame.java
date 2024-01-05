@@ -5,6 +5,7 @@ public class WaterSortGame {
   public static Stack commands = new Stack(100);
   public static Stack redo = new Stack(100);
   private static int perm = 0;
+  public static int undoPerm = 0;
   private String[] colors;
   private Bottle[] bottles;
   private int maxBottleSize;
@@ -92,7 +93,8 @@ public class WaterSortGame {
     for (int i = 0; i < bottles.length; i++) {
       if (bottles[i].getSelect()) {
         for (int j = (i + 1) % bottles.length; j != i; j = (j + 1) % bottles.length) {
-          if ((!bottles[j].isComplete() && !bottles[j].isEmpty()) || bottles[j].getSize() != maxBottleSize) {
+          if ((!bottles[j].isComplete() && !bottles[j].isEmpty())
+              || (bottles[j].getSize() != maxBottleSize && !bottles[j].isEmpty())) {
             bottles[i].deSelect();
             bottles[j].select();
             commands.push("selectNext");
@@ -107,7 +109,8 @@ public class WaterSortGame {
     for (int i = bottles.length - 1; i > -1; i--) {
       if (bottles[i].getSelect()) {
         for (int j = (i - 1 + bottles.length) % bottles.length; j != i; j = (j - 1 + bottles.length) % bottles.length) {
-          if (!bottles[j].isComplete() && !bottles[j].isEmpty() && bottles[j].getSize() == maxBottleSize) {
+          if ((!bottles[j].isComplete() && !bottles[j].isEmpty())
+              || (bottles[j].getSize() != maxBottleSize && !bottles[j].isEmpty())) {
             bottles[i].deSelect();
             bottles[j].select();
             commands.push("selectPrevious");
@@ -157,6 +160,9 @@ public class WaterSortGame {
       }
       commands.push("pour " + Bottle.getIndexOfSelectedBottle(bottles) + " " + (bottleNumber - 1) + " " + limit);
       return true;
+    }
+    if (bottles[bottleNumber - 1].getSize() != maxBottleSize) {
+      return false;
     }
     if (bottles[bottleNumber - 1].isEmpty()) {
       int limit = selectedBottle.getTop().getHeight();
@@ -231,6 +237,14 @@ public class WaterSortGame {
     int indexSelectedBottle = Bottle.getIndexOfSelectedBottle(bottles);
 
     if (indexSelectedBottle == bottleNumber - 1) {
+      return;
+    }
+
+    if (bottles[bottleNumber - 1].getSize() != maxBottleSize
+        || bottles[indexSelectedBottle].getSize() != maxBottleSize) {
+      Bottle temp = bottles[indexSelectedBottle];
+      bottles[indexSelectedBottle] = bottles[bottleNumber - 1];
+      bottles[bottleNumber - 1] = temp;
       return;
     }
 
@@ -348,6 +362,33 @@ public class WaterSortGame {
       } else if (cmd.split(" ")[0].equals("pour")) {
         pour(Integer.parseInt(cmd.split(" ")[2]) + 1);
       }
+    }
+  }
+
+  public void play() {
+    long startTime = System.currentTimeMillis();
+    long currentTime;
+
+    addEmptyBottle();
+    select(1);
+    while (!hasWon()) {
+      for (int j = (Bottle.getIndexOfSelectedBottle(bottles) + 1) % bottles.length; j != Bottle
+          .getIndexOfSelectedBottle(bottles); j = (j + 1) % bottles.length) {
+        pour(j + 1);
+        displayBottles();
+      }
+
+      selectNext();
+      currentTime = System.currentTimeMillis();
+
+      if (currentTime - startTime > 2000) {
+        break;
+      }
+    }
+    if (hasWon()) {
+      System.out.println("Win!");
+    } else {
+      System.out.println("Lose!");
     }
   }
 }

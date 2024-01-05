@@ -20,13 +20,20 @@ public class Main {
 
     WaterSortGame wsg = new WaterSortGame(colors, maxBottleSize);
 
+    System.out.println("easy or hard ?");
+    scanner.nextLine();
+    String EZHD = scanner.nextLine();
+
+    // scanner.nextLine();
+    System.out.println();
+
     String input;
     String command;
     int number;
 
     wsg.displayBottles();
 
-    scanner.nextLine();
+    // scanner.nextLine();
 
     while (true) {
       input = scanner.nextLine();
@@ -74,16 +81,27 @@ public class Main {
         WaterSortGame.redo.setEmpty();
         wsg.displayBottles();
       } else if (command.equals("undo")) {
-        wsg.undo();
-        wsg.displayBottles();
+        if (EZHD.equals("hard") && WaterSortGame.undoPerm > 4) {
+          System.out.println("not allowed");
+        } else {
+          wsg.undo();
+          wsg.displayBottles();
+          WaterSortGame.undoPerm++;
+        }
       } else if (command.equals("redo")) {
-        wsg.redo();
+        if (EZHD.equals("hard") && WaterSortGame.undoPerm > 4) {
+          System.out.println("not allowed");
+        } else {
+          wsg.redo();
+          wsg.displayBottles();
+          WaterSortGame.undoPerm++;
+        }
+      } else if (command.equals("play")) {
+        wsg.play();
         wsg.displayBottles();
       } else if (command.equals("end")) {
         break;
       }
-      WaterSortGame.commands.display();
-      WaterSortGame.redo.display();
     }
   }
 
